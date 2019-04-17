@@ -14,10 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity >=0.4.24;
-
-contract MintLike {
-    function mint(address,uint) public;
-}
+import "./lib.sol";
 
 contract Budget {
     // --- Auth ---
@@ -28,7 +25,10 @@ contract Budget {
 
     // --- Data ---
     MintLike                  public roof;
-    mapping (address => uint) public budget;
+   
+    mapping (address => uint) public budgets;
+
+    event BudgetSet(address indexed sender, address indexed usr, uint wad);
 
     constructor(address roof_) public {
         wards[msg.sender] = 1;
@@ -37,11 +37,12 @@ contract Budget {
 
     // --- Budget ---
     function mint(address usr, uint wad) public {
-        require(budget[msg.sender] >= wad);
-        budget[msg.sender] -= wad;
+        require(budgets[msg.sender] >= wad);
+        budgets[msg.sender] -= wad;
         roof.mint(usr, wad);
     }
     function budget(address usr, uint wad) public auth {
-        budget[usr] = wad;
+        budgets[usr] = wad;
+        emit BudgetSet(msg.sender, usr, wad);
     }
 }

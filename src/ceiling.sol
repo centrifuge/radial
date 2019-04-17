@@ -15,12 +15,14 @@
 
 pragma solidity >=0.4.24;
 
-contract MintLike {
-    uint public totalSupply;
+import "./lib.sol";
 
-    function mint(address,uint) public;
-}
-
+// Ceiling
+// Implements a ward that only allows minting of tokens if the `roof` has not
+// been reached. The roof is set at deployment and can not be changed after.
+// This is an effective way of implementing a fixed supply token without 
+// requiring to mint all tokens at once.
+//
 contract Ceiling {
     // --- Auth ---
     mapping (address => uint) public wards;
@@ -40,7 +42,7 @@ contract Ceiling {
 
     // --- Ceiling ---
     function mint(address usr, uint wad) public auth {
-        require(tkn.totalSupply+wad <= roof)
+        require(tkn.totalSupply()+wad <= roof, "reached-roof");
         tkn.mint(usr, wad);
     }
 }

@@ -17,7 +17,8 @@ pragma solidity >=0.4.23;
 
 import "ds-test/test.sol";
 
-import "../ceiling.sol";
+import "../budget.sol";
+import "../lib.sol";
 
 contract MockMint {
     uint public count;
@@ -37,37 +38,60 @@ contract MockMint {
     }
 }
 
-contract CeilingTest is DSTest  {
-    Ceiling roof;
+contract User {
+    function doMint(address budget, address guy, uint wad) public {
+        MintLike(budget).mint(guy, wad);
+    }
+}
+
+contract BudgetTest is DSTest  {
+    Budget   bag;
     MockMint minter;
-    address self;
+    address  self;
+    User     user1;
+    User     user2;
 
     function setUp() public {
         minter = new MockMint();
         self = address(this);
+        user1 = new User();
+        user2 = new User();
     }
 
-    function createRoof (uint max) 
+    function createBag () 
         internal 
-        returns (Ceiling) 
+        returns (Budget) 
     {
-        return new Ceiling(address(minter), max);
+        return new Budget(address(minter));
     }
 
     function testMint() public logs_gas {
-        roof = createRoof(10);
-        uint prev = minter.count();
-        assertEq(prev, 0);
-        minter.setSupply(0);
-        roof.mint(self, 10);
-        assertEq(minter.count(), 1);
-        assertEq(minter.guys(0), self);
+        bag = createBag();
+        bag.budget(address(user1), 10);
+        bag.budget(address(user2), 10);
+        user1.doMint(address(bag), self, 10);
+        user2.doMint(address(bag), self, 10);
+        assertEq(minter.count(), 2);
         assertEq(minter.wads(0), 10);
+        assertEq(minter.guys(0), self);
     }
 
-    function testFailMint() public {
-        roof = createRoof(10);
-        minter.setSupply(10);
-        roof.mint(self, 10);
+    function testFailOverBudgetMint() public logs_gas {
+        bag = createBag();
+        bag.budget(address(user1), 10);
+        user1.doMint(address(bag), self, 30);
+    }
+   
+    function testFailOverBudgetMultipleMint() public logs_gas {
+        bag = createBag();
+        bag.budget(address(user1), 10);
+        user1.doMint(address(bag), self, 5);
+        user1.doMint(address(bag), self, 5);
+        user1.doMint(address(bag), self, 5);
+    }
+   
+    function testFailMint() public logs_gas {
+        bag = createBag();
+        user1.doMint(address(bag), self, 10);
     }
 }
