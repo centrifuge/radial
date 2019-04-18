@@ -40,7 +40,6 @@ contract DeployTest is DSTest  {
     }
     function testFailDeploy() public logs_gas {
         MedallionFab depl = new MedallionFab(100, self);
-        Medallion mdln = Medallion(depl.mdln());
         Budget bags = Budget(depl.bags());
         
         bags.budget(self, 10);
