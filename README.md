@@ -23,7 +23,7 @@ The ward has 3 methods:
 ### Layered Small Simple Contracts 
 Smaller contracts that have specific features allow for a more flexible design that is easier to verify and audit.
 
-![architecture.svg](architecture.svg)
+![architecture diagram, see graphviz below](./architecture.svg)
 ```graphviz
 digraph {
                 rankdir=LR;
