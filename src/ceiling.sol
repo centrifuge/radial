@@ -40,9 +40,14 @@ contract Ceiling {
         roof = roof_;
     }
 
+    // --- Math ---
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "math-add-overflow");
+    }
+
     // --- Ceiling ---
     function mint(address usr, uint wad) public auth {
-        require(tkn.totalSupply()+wad <= roof, "reached-roof");
+        require(add(tkn.totalSupply(), wad) <= roof, "reached-roof");
         tkn.mint(usr, wad);
     }
 }
