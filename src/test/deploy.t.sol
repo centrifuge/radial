@@ -38,6 +38,7 @@ contract DeployTest is DSTest  {
         assertEq(mdln.balanceOf(self), 10);
         assertEq(mdln.totalSupply(), 10);
     }
+
     function testFailDeploy() public logs_gas {
         MedallionFab depl = new MedallionFab(100, self);
         Budget bags = Budget(depl.bags());
