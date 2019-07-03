@@ -16,31 +16,31 @@
 pragma solidity >=0.4.24;
 
 import './lib.sol';
-import './medallion.sol';
+import './token.sol';
 import './ceiling.sol';
 import './budget.sol';
 
-// MedallionFab deploys an ERC20 token, an instance of Ceiling and Budget 
-// removing the deployer address from the wards of the Medallion and Ceiling 
+// CentrifugeTokenFab deploys an ERC20 token, an instance of Ceiling and Budget 
+// removing the deployer address from the wards of the Token and Ceiling 
 // contracts.
 //
 // By doing the entire deploy in one transaction, we can simplify auditing of 
-// the deploy and ensure that no ward was added to any of the Medallion and
+// the deploy and ensure that no ward was added to any of the Token and
 // Ceiling contract other than the Budget ward.
 //
-contract MedallionFab {
-    Medallion public mdln;
-    Ceiling public   ceil;
-    Budget public    bags;
+contract CentrifugeTokenFab {
+    Token   public    tkn;
+    Ceiling public    ceil;
+    Budget  public    bags;
 
     constructor (uint roof, address ward) public {
         address self = address(this);
-        mdln = new Medallion("MDLN", "Centrifuge Medallion", "1", 0); // TODO: chainid/memory
-        ceil = new Ceiling(address(mdln), roof);
+        tkn = new Token(0); 
+        ceil = new Ceiling(address(tkn), roof);
         bags = new Budget(address(ceil));
         
-        mdln.rely(address(ceil));
-        mdln.deny(self);
+        tkn.rely(address(ceil));
+        tkn.deny(self);
         ceil.rely(address(bags));
         ceil.deny(self);
         bags.rely(ward);

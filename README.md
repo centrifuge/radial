@@ -1,4 +1,4 @@
-# Medallion Token
+# Centrifuge Token
 ## Architecture
 This is heavily inspired by DappHub the contracts taking their learnings from years of solidity development and architecture considerations for enabling simpler formal verification of the contract.
 

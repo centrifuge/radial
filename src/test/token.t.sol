@@ -1,6 +1,7 @@
-/// erc20.t.sol -- test for erc20.sol
+/// token.t.sol -- test for token.sol
 
-// Copyright (C) 2015-2019  DappHub, LLC
+// Copyright (C) 2015-2019  DappHub, LLC, 
+// Copyright (C) 2019 lucasvo
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,12 +20,12 @@ pragma solidity >=0.4.23;
 
 import "ds-test/test.sol";
 
-import "../medallion.sol";
+import "../token.sol";
 
 contract TokenUser {
-    Medallion  token;
+    Token  token;
 
-    constructor(Medallion token_) public {
+    constructor(Token token_) public {
         token = token_;
     }
 
@@ -61,11 +62,11 @@ contract TokenUser {
         return token.balanceOf(who);
     }
 
-    function doApprove(address guy)
+    function doApprove(address usr)
         public
         returns (bool)
     {
-        return token.approve(guy, uint(-1));
+        return token.approve(usr, uint(-1));
     }
     function doMint(uint wad) public {
         token.mint(address(this), wad);
@@ -73,20 +74,20 @@ contract TokenUser {
     function doBurn(uint wad) public {
         token.burn(address(this), wad);
     }
-    function doMint(address guy, uint wad) public {
-        token.mint(guy, wad);
+    function doMint(address usr, uint wad) public {
+        token.mint(usr, wad);
     }
-    function doBurn(address guy, uint wad) public {
-        token.burn(guy, wad);
+    function doBurn(address usr, uint wad) public {
+        token.burn(usr, wad);
     }
 
 }
 
-contract MedallionTest is DSTest {
+contract TokenTest is DSTest {
     uint constant initialBalanceThis = 1000;
     uint constant initialBalanceCal = 100;
 
-    Medallion token;
+    Token token;
     address user1;
     address user2;
     address self;
@@ -111,8 +112,8 @@ contract MedallionTest is DSTest {
         self = address(this);
     }
 
-    function createToken() internal returns (Medallion) {
-        return new Medallion("$","TST", "1", 1);
+    function createToken() internal returns (Token) {
+        return new Token(1);
     }
 
     function testSetupPrecondition() public {
@@ -186,15 +187,15 @@ contract MedallionTest is DSTest {
         token.mint(address(this), mintAmount);
         assertEq(token.balanceOf(self), initialBalanceThis + mintAmount);
     }
-    function testMintGuy() public {
+    function testMintUsr() public {
         uint mintAmount = 10;
         token.mint(user1, mintAmount);
         assertEq(token.balanceOf(user1), mintAmount);
     }
-    function testFailMintGuyNoAuth() public {
+    function testFailMintUsrNoAuth() public {
         TokenUser(user1).doMint(user2, 10);
     }
-    function testMintGuyAuth() public {
+    function testMintUsrAuth() public {
         token.rely(user1);
         TokenUser(user1).doMint(user2, 10);
     }
@@ -209,7 +210,7 @@ contract MedallionTest is DSTest {
         token.burn(address(this), burnAmount);
         assertEq(token.balanceOf(self), initialBalanceThis - burnAmount);
     }
-    function testBurnGuyWithTrust() public {
+    function testBurnUsrWithTrust() public {
         uint burnAmount = 10;
         token.transfer(user1, burnAmount);
         assertEq(token.balanceOf(user1), burnAmount);
@@ -223,7 +224,7 @@ contract MedallionTest is DSTest {
         token.rely(user1);
         TokenUser(user1).doBurn(10);
     }
-    function testBurnGuyAuth() public {
+    function testBurnUsrAuth() public {
         token.transfer(user2, 10);
         //        token.rely(user1);
         TokenUser(user2).doApprove(user1);

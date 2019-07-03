@@ -15,33 +15,33 @@
 
 pragma solidity >=0.4.24;
 
-contract Medallion {
+contract Token {
     // --- Auth ---
     mapping (address => uint) public wards;
-    function rely(address guy) public auth { wards[guy] = 1; }
-    function deny(address guy) public auth { wards[guy] = 0; }
+    function rely(address usr) public auth { wards[usr] = 1; }
+    function deny(address usr) public auth { wards[usr] = 0; }
     modifier auth { require(wards[msg.sender] == 1); _; }
 
     // --- ERC20 Data ---
-    uint8   public decimals = 18;
-    string  public name;
-    string  public symbol;
-    string  public version;
+    string  public constant name     = "Centrifuge Token";
+    string  public constant symbol   = "CENT";
+    string  public constant version  = "1";
+    uint8   public constant decimals = 18;
     uint256 public totalSupply;
 
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint)                      public nonces;
 
-    event Approval(address indexed src, address indexed guy, uint wad);
+    event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
 
     // --- Math ---
     function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "math-add-overflow");
+        require((z = x + y) >= x);
     }
     function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x, "math-sub-underflow");
+        require((z = x - y) <= x);
     }
 
     // --- EIP712 niceties ---
@@ -50,14 +50,12 @@ contract Medallion {
         "Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"
     );
 
-    constructor(string memory symbol_, string memory name_, string memory version_, uint256 chainId_) public {
+    constructor(uint256 chainId_) public {
         wards[msg.sender] = 1;
-        symbol = symbol_;
-        name = name_;
         DOMAIN_SEPARATOR = keccak256(abi.encode(
             keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-            keccak256("Dai Semi-Automated Permit Office"),
-            keccak256(bytes(version_)),
+            keccak256(bytes(name)),
+            keccak256(bytes(version)),
             chainId_,
             address(this)
         ));
@@ -70,7 +68,9 @@ contract Medallion {
     function transferFrom(address src, address dst, uint wad)
         public returns (bool)
     {
+        require(balanceOf[src] >= wad, "cent/insufficient-balance");
         if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
+            require(allowance[src][msg.sender] >= wad, "cent/insufficient-allowance");
             allowance[src][msg.sender] = sub(allowance[src][msg.sender], wad);
         }
         balanceOf[src] = sub(balanceOf[src], wad);
@@ -84,7 +84,9 @@ contract Medallion {
         emit Transfer(address(0), usr, wad);
     }
     function burn(address usr, uint wad) public {
+        require(balanceOf[usr] >= wad, "cent/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
+            require(allowance[usr][msg.sender] >= wad, "cent/insufficient-allowance");
             allowance[usr][msg.sender] = sub(allowance[usr][msg.sender], wad);
         }
         balanceOf[usr] = sub(balanceOf[usr], wad);
@@ -96,7 +98,6 @@ contract Medallion {
         emit Approval(msg.sender, usr, wad);
         return true;
     }
-
     // --- Alias ---
     function push(address usr, uint wad) public {
         transferFrom(msg.sender, usr, wad);
@@ -123,9 +124,9 @@ contract Medallion {
                                      expiry,
                                      allowed))
         ));
-        require(holder == ecrecover(digest, v, r, s), "invalid permit");
-        require(expiry == 0 || expiry < now, "permit expired");
-        require(nonce == nonces[holder]++, "invalid nonce");
+        require(holder == ecrecover(digest, v, r, s), "cent/invalid-permit");
+        require(expiry == 0 || now <= expiry, "cent/permit-expired");
+        require(nonce == nonces[holder]++, "cent/invalid-nonce");
         uint wad = allowed ? uint(-1) : 0;
         allowance[holder][spender] = wad;
         emit Approval(holder, spender, wad);

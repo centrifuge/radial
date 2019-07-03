@@ -19,7 +19,7 @@ import "ds-test/test.sol";
 
 import "../deploy.sol";
 import "../budget.sol";
-import "../medallion.sol";
+import "../token.sol";
 
 contract DeployTest is DSTest  {
     address self;
@@ -29,19 +29,19 @@ contract DeployTest is DSTest  {
     }
 
     function testDeploy() public logs_gas {
-        MedallionFab depl = new MedallionFab(100, self);
-        Medallion mdln = Medallion(depl.mdln());
-        Budget bags = Budget(depl.bags());
+        CentrifugeTokenFab  depl = new CentrifugeTokenFab(100, self);
+        Token               tkn  = Token(depl.tkn());
+        Budget              bags = Budget(depl.bags());
         
         bags.budget(self, 10);
         bags.mint(self, 10);
-        assertEq(mdln.balanceOf(self), 10);
-        assertEq(mdln.totalSupply(), 10);
+        assertEq(tkn.balanceOf(self), 10);
+        assertEq(tkn.totalSupply(), 10);
     }
 
     function testFailDeploy() public logs_gas {
-        MedallionFab depl = new MedallionFab(100, self);
-        Budget bags = Budget(depl.bags());
+        CentrifugeTokenFab  depl = new CentrifugeTokenFab(100, self);
+        Budget bags   = Budget(depl.bags());
         
         bags.budget(self, 10);
         bags.mint(self, 20);
