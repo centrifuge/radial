@@ -42,7 +42,7 @@ contract Ceiling {
 
     // --- Math ---
     function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "math-add-overflow");
+        require((z = x + y) >= x);
     }
 
     // --- Ceiling ---
