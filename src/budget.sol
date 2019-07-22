@@ -37,10 +37,11 @@ contract Budget {
 
     // --- Budget ---
     function mint(address usr, uint wad) public {
+        roof.mint(usr, wad);
         require(budgets[msg.sender] >= wad);
         budgets[msg.sender] -= wad;
-        roof.mint(usr, wad);
     }
+
     function budget(address usr, uint wad) public auth {
         budgets[usr] = wad;
         emit BudgetSet(msg.sender, usr, wad);
