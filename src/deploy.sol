@@ -16,26 +16,26 @@
 pragma solidity >=0.4.24;
 
 import './lib.sol';
-import './token.sol';
+import './radial.sol';
 import './ceiling.sol';
 import './budget.sol';
 
-// CentrifugeTokenFab deploys an ERC20 token, an instance of Ceiling and Budget 
-// removing the deployer address from the wards of the Token and Ceiling 
+// CentrifugeRadialFab deploys the Radial ERC20 token, an instance of Ceiling and Budget 
+// removing the deployer address from the wards of the Radial and Ceiling 
 // contracts.
 //
 // By doing the entire deploy in one transaction, we can simplify auditing of 
-// the deploy and ensure that no ward was added to any of the Token and
+// the deploy and ensure that no ward was added to any of the Radial and
 // Ceiling contract other than the Budget ward.
 //
-contract CentrifugeTokenFab {
-    Token   public    tkn;
+contract RadialFab {
+    Radial  public    tkn;
     Ceiling public    ceil;
     Budget  public    bags;
 
     constructor (uint roof, address ward) public {
         address self = address(this);
-        tkn = new Token(0); 
+        tkn = new Radial(0); 
         ceil = new Ceiling(address(tkn), roof);
         bags = new Budget(address(ceil));
         

@@ -1,4 +1,4 @@
-# Centrifuge Token
+# Centrifuge Radial Token
 ## Architecture
 This is heavily inspired by DappHub the contracts taking their learnings from years of solidity development and architecture considerations for enabling simpler formal verification of the contract.
 
@@ -35,14 +35,14 @@ digraph {
                 "Ecosystem Fund \n multisig" -> Budget [color=grey]
                 "Rewards Contract"->Budget [color=grey]
                 Budget->Ceiling;
-                Ceiling->Token;                
+                Ceiling->Radial;                
 }
 ```
 
 
 ## Contracts
-### Token
-The `Token` contract should be a standard conform ERC20 contract. In addition to implementing all standard ERC20 methods & events, it implements the `Ward` pattern and has a mint method. This is mostly a copy of the MakerDAO Dai token contract.
+### Radial
+The `Radial` contract should be a standard conform ERC20 contract. In addition to implementing all standard ERC20 methods & events, it implements the `Ward` pattern and has a mint method. This is mostly a copy of the MakerDAO Dai token contract.
 
 ### Ceiling 
 The `Ceiling` is the first ward, it's only purpose is to verify that any call to mint() would not result in the token available supply to surpass the limit that is hardcoded in the `Ceiling` contract.

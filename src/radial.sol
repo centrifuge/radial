@@ -15,7 +15,7 @@
 
 pragma solidity >=0.4.24;
 
-contract Token {
+contract Radial {
     // --- Auth ---
     mapping (address => uint) public wards;
     function rely(address usr) public auth { wards[usr] = 1; }
@@ -23,8 +23,8 @@ contract Token {
     modifier auth { require(wards[msg.sender] == 1); _; }
 
     // --- ERC20 Data ---
-    string  public constant name     = "Centrifuge Token";
-    string  public constant symbol   = "CENT";
+    string  public constant name     = "Radial";
+    string  public constant symbol   = "RAD";
     string  public constant version  = "1";
     uint8   public constant decimals = 18;
     uint256 public totalSupply;
@@ -61,7 +61,7 @@ contract Token {
         ));
     }
 
-    // --- Token ---
+    // --- Radial Token ---
     function transfer(address dst, uint wad) public returns (bool) {
         return transferFrom(msg.sender, dst, wad);
     }

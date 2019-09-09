@@ -19,7 +19,7 @@ import "ds-test/test.sol";
 
 import "../deploy.sol";
 import "../budget.sol";
-import "../token.sol";
+import "../radial.sol";
 
 contract DeployTest is DSTest  {
     address self;
@@ -29,9 +29,9 @@ contract DeployTest is DSTest  {
     }
 
     function testDeploy() public logs_gas {
-        CentrifugeTokenFab  depl = new CentrifugeTokenFab(100, self);
-        Token               tkn  = Token(depl.tkn());
-        Budget              bags = Budget(depl.bags());
+        RadialFab     depl = new RadialFab(100, self);
+        Radial        tkn  = Radial(depl.tkn());
+        Budget        bags = Budget(depl.bags());
         
         bags.budget(self, 10);
         bags.mint(self, 10);
@@ -40,7 +40,7 @@ contract DeployTest is DSTest  {
     }
 
     function testFailDeploy() public logs_gas {
-        CentrifugeTokenFab  depl = new CentrifugeTokenFab(100, self);
+        RadialFab  depl = new RadialFab(100, self);
         Budget bags   = Budget(depl.bags());
         
         bags.budget(self, 10);
