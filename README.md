@@ -1,6 +1,6 @@
 # Centrifuge Radial Token
 ## Token Functionality
-The Radial token is an ERC20 token that behaves according to the ERC20 specification. 
+The Radial token is an ERC20 token that behaves according to the [ERC20 standard](https://eips.ethereum.org/EIPS/eip-20). 
 
 ### Fixed limit on supply
 The supply of the Radial token is dynamic, not all of it's supply will be minted at creation however the contract enforces that the fixed supply of 1 Billion can never be exceeded.
