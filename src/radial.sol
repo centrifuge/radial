@@ -124,6 +124,7 @@ contract Radial {
                                      expiry,
                                      allowed))
         ));
+        require(holder != address(0), "cent/invalid-address-0");
         require(holder == ecrecover(digest, v, r, s), "cent/invalid-permit");
         require(expiry == 0 || now <= expiry, "cent/permit-expired");
         require(nonce == nonces[holder]++, "cent/invalid-nonce");
