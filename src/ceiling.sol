@@ -13,21 +13,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.4.24;
+pragma solidity 0.5.12;
 
 import "./lib.sol";
 
 // Ceiling
 // Implements a ward that only allows minting of tokens if the `roof` has not
 // been reached. The roof is set at deployment and can not be changed after.
-// This is an effective way of implementing a fixed supply token without 
+// This is an effective way of implementing a fixed supply token without
 // requiring to mint all tokens at once.
 //
 contract Ceiling {
     // --- Auth ---
     mapping (address => uint) public wards;
-    function rely(address guy) public auth { wards[guy] = 1; }
-    function deny(address guy) public auth { wards[guy] = 0; }
+    function rely(address usr) public auth { wards[usr] = 1; }
+    function deny(address usr) public auth { wards[usr] = 0; }
     modifier auth { require(wards[msg.sender] == 1); _; }
 
     // --- Data ---
@@ -47,7 +47,7 @@ contract Ceiling {
 
     // --- Ceiling ---
     function mint(address usr, uint wad) public auth {
-        require(add(tkn.totalSupply(), wad) <= roof, "reached-roof");
+        require(add(tkn.totalSupply(), wad) <= roof, "cent/reached-roof");
         tkn.mint(usr, wad);
     }
 }

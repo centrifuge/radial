@@ -1,6 +1,6 @@
 # Centrifuge Radial Token
 ## Token Functionality
-The Radial token is an ERC20 token that behaves according to the [ERC20 standard](https://eips.ethereum.org/EIPS/eip-20). 
+The Radial token is an ERC20 token that behaves according to the [ERC20 standard](https://eips.ethereum.org/EIPS/eip-20).
 
 ### Fixed limit on supply
 The supply of the Radial token is dynamic, not all of it's supply will be minted at creation however the contract enforces that the fixed supply of 1 Billion can never be exceeded.
@@ -19,15 +19,15 @@ This is heavily inspired by DappHub the contracts taking their learnings from ye
 The ERC20 token functionality for the Radial token is copied from the [MakerDAO Dai ERC20 contract](https://github.com/makerdao/dss/blob/master/src/dai.sol) and no modifications have been made to this contract. All additional functionality implemented for the Radial token is done in two additional contracts that are authorized to mint token in the ERC20 contract (`src/radial.sol`).
 
 ### Ward
-The concept of a ward is that a contract defines a single address that may interact with the contract. The ward can be changed only by the ward. This is a very flexible design that allows for further limiting the contracts or changing functionality by chaining different wards. The simplest implementation of a ward looks as follows: 
+The concept of a ward is that a contract defines a single address that may interact with the contract. The ward can be changed only by the ward. This is a very flexible design that allows for further limiting the contracts or changing functionality by chaining different wards. The simplest implementation of a ward looks as follows:
 
 ```javascript
 // See: https://github.com/makerdao/dss/blob/master/src/dai.sol#L19
 contract Ward {
     mapping (address => uint) public wards;
     modifier auth { require(wards[msg.sender]); _; }
-    function rely(address guy) public auth { wards[guy] = 1; }
-    function deny(address guy) public auth { wards[guy] = 0; } 
+    function rely(address usr) public auth { wards[usr] = 1; }
+    function deny(address usr) public auth { wards[usr] = 0; }
 }
 ```
 
@@ -36,7 +36,7 @@ The ward has 3 methods:
 2) Deny: removes an address to the list of wards
 3) Auth: a modifier that checks that msg.sender is a ward
 
-### Layered Small Simple Contracts 
+### Layered Small Simple Contracts
 Smaller contracts that have specific features allow for a more flexible design that is easier to verify and audit.
 
 ![architecture diagram, see graphviz below](./architecture.svg)
@@ -51,7 +51,7 @@ digraph {
                 "Ecosystem Fund \n multisig" -> Budget [color=grey]
                 "Rewards Contract"->Budget [color=grey]
                 Budget->Ceiling;
-                Ceiling->Radial;                
+                Ceiling->Radial;
 }
 ```
 
@@ -60,7 +60,7 @@ digraph {
 ### Radial
 The `Radial` contract should be a standard conform ERC20 contract. In addition to implementing all standard ERC20 methods & events, it implements the `Ward` pattern and has a mint method. This is a copy of the MakerDAO Dai token contract.
 
-### Ceiling 
+### Ceiling
 The `Ceiling` is the first ward, it's only purpose is to verify that any call to mint() would not result in the token available supply to surpass the limit that is hardcoded in the `Ceiling` contract.
 
 ### Budget

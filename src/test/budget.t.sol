@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.4.23;
+pragma solidity 0.5.12;
 
 import "ds-test/test.sol";
 
@@ -24,23 +24,23 @@ contract MockMint {
     uint public count;
     uint public totalSupply;
 
-    address[] public guys;
+    address[] public usrs;
     uint[] public    wads;
 
     function setSupply(uint sup) public {
         totalSupply = sup;
     }
-    
-    function mint(address guy, uint wad) public {
-        guys.push(guy);
+
+    function mint(address usr, uint wad) public {
+        usrs.push(usr);
         wads.push(wad);
         count = count+1;
     }
 }
 
 contract User {
-    function doMint(address budget, address guy, uint wad) public {
-        MintLike(budget).mint(guy, wad);
+    function doMint(address budget, address usr, uint wad) public {
+        MintLike(budget).mint(usr, wad);
     }
 }
 
@@ -58,9 +58,9 @@ contract BudgetTest is DSTest  {
         user2 = new User();
     }
 
-    function createBag () 
-        internal 
-        returns (Budget) 
+    function createBag ()
+        internal
+        returns (Budget)
     {
         return new Budget(address(minter));
     }
@@ -73,7 +73,7 @@ contract BudgetTest is DSTest  {
         user2.doMint(address(bag), self, 10);
         assertEq(minter.count(), 2);
         assertEq(minter.wads(0), 10);
-        assertEq(minter.guys(0), self);
+        assertEq(minter.usrs(0), self);
     }
 
     function testFailOverBudgetMint() public logs_gas {
@@ -81,7 +81,7 @@ contract BudgetTest is DSTest  {
         bag.budget(address(user1), 10);
         user1.doMint(address(bag), self, 30);
     }
-   
+
     function testFailOverBudgetMultipleMint() public logs_gas {
         bag = createBag();
         bag.budget(address(user1), 10);
@@ -89,7 +89,7 @@ contract BudgetTest is DSTest  {
         user1.doMint(address(bag), self, 5);
         user1.doMint(address(bag), self, 5);
     }
-   
+
     function testFailMint() public logs_gas {
         bag = createBag();
         user1.doMint(address(bag), self, 10);

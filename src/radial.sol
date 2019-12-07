@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.4.24;
+pragma solidity 0.5.12;
 
 contract Radial {
     // --- Auth ---
@@ -46,10 +46,8 @@ contract Radial {
 
     // --- EIP712 niceties ---
     bytes32 public DOMAIN_SEPARATOR;
-    bytes32 public constant PERMIT_TYPEHASH = keccak256(
-        "Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"
-    );
-
+    // bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)");
+    bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
     constructor(uint256 chainId_) public {
         wards[msg.sender] = 1;
         DOMAIN_SEPARATOR = keccak256(abi.encode(
@@ -62,7 +60,7 @@ contract Radial {
     }
 
     // --- Radial Token ---
-    function transfer(address dst, uint wad) public returns (bool) {
+    function transfer(address dst, uint wad) external returns (bool) {
         return transferFrom(msg.sender, dst, wad);
     }
     function transferFrom(address src, address dst, uint wad)
@@ -78,12 +76,12 @@ contract Radial {
         emit Transfer(src, dst, wad);
         return true;
     }
-    function mint(address usr, uint wad) public auth {
+    function mint(address usr, uint wad) external auth {
         balanceOf[usr] = add(balanceOf[usr], wad);
         totalSupply    = add(totalSupply, wad);
         emit Transfer(address(0), usr, wad);
     }
-    function burn(address usr, uint wad) public {
+    function burn(address usr, uint wad) external {
         require(balanceOf[usr] >= wad, "cent/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
             require(allowance[usr][msg.sender] >= wad, "cent/insufficient-allowance");
@@ -93,19 +91,19 @@ contract Radial {
         totalSupply    = sub(totalSupply, wad);
         emit Transfer(usr, address(0), wad);
     }
-    function approve(address usr, uint wad) public returns (bool) {
+    function approve(address usr, uint wad) external returns (bool) {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
         return true;
     }
     // --- Alias ---
-    function push(address usr, uint wad) public {
+    function push(address usr, uint wad) external {
         transferFrom(msg.sender, usr, wad);
     }
-    function pull(address usr, uint wad) public {
+    function pull(address usr, uint wad) external {
         transferFrom(usr, msg.sender, wad);
     }
-    function move(address src, address dst, uint wad) public {
+    function move(address src, address dst, uint wad) external {
         transferFrom(src, dst, wad);
     }
 
@@ -124,6 +122,7 @@ contract Radial {
                                      expiry,
                                      allowed))
         ));
+        require(holder != address(0), "cent/invalid-address-0");
         require(holder == ecrecover(digest, v, r, s), "cent/invalid-permit");
         require(expiry == 0 || now <= expiry, "cent/permit-expired");
         require(nonce == nonces[holder]++, "cent/invalid-nonce");

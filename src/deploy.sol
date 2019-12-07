@@ -20,11 +20,11 @@ import './radial.sol';
 import './ceiling.sol';
 import './budget.sol';
 
-// CentrifugeRadialFab deploys the Radial ERC20 token, an instance of Ceiling and Budget 
-// removing the deployer address from the wards of the Radial and Ceiling 
+// RadialFab deploys the Radial ERC20 token, an instance of Ceiling and Budget
+// removing the deployer address from the wards of the Radial and Ceiling
 // contracts.
 //
-// By doing the entire deploy in one transaction, we can simplify auditing of 
+// By doing the entire deploy in one transaction, we can simplify auditing of
 // the deploy and ensure that no ward was added to any of the Radial and
 // Ceiling contract other than the Budget ward.
 //
@@ -33,12 +33,12 @@ contract RadialFab {
     Ceiling public    ceil;
     Budget  public    bags;
 
-    constructor (uint roof, address ward) public {
+    constructor (uint roof, address ward, uint chainid) public {
         address self = address(this);
-        tkn = new Radial(0); 
+        tkn = new Radial(chainid);
         ceil = new Ceiling(address(tkn), roof);
         bags = new Budget(address(ceil));
-        
+
         tkn.rely(address(ceil));
         tkn.deny(self);
         ceil.rely(address(bags));

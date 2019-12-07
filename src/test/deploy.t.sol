@@ -21,28 +21,84 @@ import "../deploy.sol";
 import "../budget.sol";
 import "../radial.sol";
 
+contract Ward {
+  function rely(address) public {}
+  function deny(address) public {}
+}
+
+contract RadialUser {
+    Budget budget;
+    function file(address _budget) public {
+        budget = Budget(_budget);
+    }
+
+    function doRely(address dst, address usr) public {
+        Ward(dst).rely(usr);
+    }
+
+    function doDeny(address dst, address usr) public {
+        Ward(dst).deny(usr);
+    }
+
+    function doBudget(address usr, uint wad) public {
+        budget.budget(usr, wad);
+    }
+}
+
+
+
 contract DeployTest is DSTest  {
     address self;
-    
-    function setUp() public {
+    RadialUser usr;
+
+    function setUp() public{
         self = address(this);
+        usr = new RadialUser();
+        super.setUp();
     }
 
     function testDeploy() public logs_gas {
-        RadialFab     depl = new RadialFab(100, self);
-        Radial        tkn  = Radial(depl.tkn());
-        Budget        bags = Budget(depl.bags());
-        
-        bags.budget(self, 10);
+        RadialFab     depl = new RadialFab(100, address(usr), 99);
+        Radial        tkn  = depl.tkn();
+        Budget        bags = depl.bags();
+
+        usr.file(address(depl.bags()));
+        usr.doBudget(self, 10);
+
         bags.mint(self, 10);
         assertEq(tkn.balanceOf(self), 10);
         assertEq(tkn.totalSupply(), 10);
     }
 
-    function testFailDeploy() public logs_gas {
-        RadialFab  depl = new RadialFab(100, self);
-        Budget bags   = Budget(depl.bags());
-        
+    function testFailDeploySelf() public {
+        RadialFab     depl = new RadialFab(100, address(usr), 99);
+        Budget        bags = depl.bags();
+        bags.budget(self, 10);
+    }
+
+    function testFailDeployBreakCeiling() public {
+        RadialFab     depl = new RadialFab(100, self, 99);
+        Budget        bags = depl.bags();
+        bags.budget(self, 200);
+        bags.mint(self, 200);
+    }
+
+    function testFailDeployCallCeiling() public {
+        RadialFab     depl = new RadialFab(100, self, 99);
+        Ceiling       ceil = depl.ceil();
+        ceil.mint(self, 10);
+    }
+
+    function testFailDeployCallRadial() public {
+        RadialFab     depl = new RadialFab(100, self, 99);
+        Radial        tkn  = depl.tkn();
+        tkn.mint(self, 10);
+    }
+
+    function testFailDeployNoBudget() public {
+        RadialFab  depl = new RadialFab(100, self, 99);
+        Budget bags     = depl.bags();
+
         bags.budget(self, 10);
         bags.mint(self, 20);
     }

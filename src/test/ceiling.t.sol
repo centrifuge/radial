@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.4.23;
+pragma solidity 0.5.12;
 
 import "ds-test/test.sol";
 
@@ -23,15 +23,15 @@ contract MockMint {
     uint public count;
     uint public totalSupply;
 
-    address[] public guys;
+    address[] public usrs;
     uint[] public    wads;
 
     function setSupply(uint sup) public {
         totalSupply = sup;
     }
-    
-    function mint(address guy, uint wad) public {
-        guys.push(guy);
+
+    function mint(address usr, uint wad) public {
+        usrs.push(usr);
         wads.push(wad);
         count = count+1;
     }
@@ -47,9 +47,9 @@ contract CeilingTest is DSTest  {
         self = address(this);
     }
 
-    function createRoof (uint max) 
-        internal 
-        returns (Ceiling) 
+    function createRoof (uint max)
+        internal
+        returns (Ceiling)
     {
         return new Ceiling(address(minter), max);
     }
@@ -61,7 +61,7 @@ contract CeilingTest is DSTest  {
         minter.setSupply(0);
         roof.mint(self, 10);
         assertEq(minter.count(), 1);
-        assertEq(minter.guys(0), self);
+        assertEq(minter.usrs(0), self);
         assertEq(minter.wads(0), 10);
     }
 
