@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.5.12;
+pragma solidity ^0.6.0;
 
 contract Radial {
     // --- Auth ---
@@ -81,22 +81,32 @@ contract Radial {
         totalSupply    = add(totalSupply, wad);
         emit Transfer(address(0), usr, wad);
     }
-    function burn(address usr, uint wad) external {
+
+    function _burn(address sender, address usr, uint wad) internal virtual {
         require(balanceOf[usr] >= wad, "cent/insufficient-balance");
-        if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
-            require(allowance[usr][msg.sender] >= wad, "cent/insufficient-allowance");
-            allowance[usr][msg.sender] = sub(allowance[usr][msg.sender], wad);
+        if (usr != sender && allowance[usr][sender] != uint(-1)) {
+            require(allowance[usr][sender] >= wad, "cent/insufficient-allowance");
+            allowance[usr][sender] = sub(allowance[usr][sender], wad);
         }
         balanceOf[usr] = sub(balanceOf[usr], wad);
         totalSupply    = sub(totalSupply, wad);
         emit Transfer(usr, address(0), wad);
     }
+
+    function burn(address usr, uint wad) external {
+        _burn(msg.sender, usr, wad);
+    }
+
     function approve(address usr, uint wad) external returns (bool) {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
         return true;
     }
+
     // --- Alias ---
+    function burnFrom(address usr, uint wad) external {
+        _burn(msg.sender, usr, wad);
+    }
     function push(address usr, uint wad) external {
         transferFrom(msg.sender, usr, wad);
     }
