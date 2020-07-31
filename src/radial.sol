@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.6.0;
+pragma solidity 0.5.12;
 
 contract Radial {
     // --- Auth ---
@@ -82,7 +82,7 @@ contract Radial {
         emit Transfer(address(0), usr, wad);
     }
 
-    function _burn(address sender, address usr, uint wad) internal virtual {
+    function _burn(address sender, address usr, uint wad) internal {
         require(balanceOf[usr] >= wad, "cent/insufficient-balance");
         if (usr != sender && allowance[usr][sender] != uint(-1)) {
             require(allowance[usr][sender] >= wad, "cent/insufficient-allowance");
