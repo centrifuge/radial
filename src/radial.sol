@@ -81,7 +81,8 @@ contract Radial {
         totalSupply    = add(totalSupply, wad);
         emit Transfer(address(0), usr, wad);
     }
-    function burn(address usr, uint wad) external {
+
+    function burn(address usr, uint wad) public {
         require(balanceOf[usr] >= wad, "cent/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
             require(allowance[usr][msg.sender] >= wad, "cent/insufficient-allowance");
@@ -91,12 +92,17 @@ contract Radial {
         totalSupply    = sub(totalSupply, wad);
         emit Transfer(usr, address(0), wad);
     }
+
     function approve(address usr, uint wad) external returns (bool) {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
         return true;
     }
+
     // --- Alias ---
+    function burnFrom(address usr, uint wad) external {
+        burn(usr, wad);
+    }
     function push(address usr, uint wad) external {
         transferFrom(msg.sender, usr, wad);
     }
